@@ -1,23 +1,26 @@
-# meta developer: @Honorpadx9lte
-
 from .. import loader, utils
 import asyncio
 
 @loader.tds
-class TypeWriterMod(loader.Module):
-    """Эффект печати для Hikka"""
-    strings = {"name": "TypeWriter"}
+class SpeedControlMod(loader.Module):
+    """Пример модуля с настройкой скорости"""
+    strings = {"name": "SpeedControl"}
 
-    async def textcmd(self, message):
-        """<текст> - Печатать текст с задержкой 0.4с"""
-        args = utils.get_args_raw(message)
-        if not args:
-            return await utils.answer(message, "<b>Введите текст</b>")
+    def __init__(self):
+        # Создаем настройку в конфиге (параметры: имя, дефолт, описание)
+        self.config = loader.ModuleConfig(
+            "delay", 0.5, "Скорость анимации (от 0.1 до 1.0)"
+        )
 
-        display_text = ""
-        for char in args:
-            display_text += char
-            await message.edit(f"{display_text}|")
-            await asyncio.sleep(0.4)
+    @loader.command()
+    async def fastcmd(self, message):
+        """Команда для теста скорости"""
+        # Проверяем, чтобы значение было в рамках разумного
+        delay = max(0.1, min(1.0, float(self.config["delay"])))
         
-        await message.edit(display_text)
+        text = "Это тест скорости..."
+        output = ""
+        for char in text:
+            output += char
+            await message.edit(output)
+            await asyncio.sleep(delay)
